@@ -29,6 +29,12 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <!--ContentProvirder также необходимо указать в манифесте-->
+        <!--Параметр exported - виден ли провайдер для других приложений-->
+        <provider
+            android:authorities="com.example.clubolympus"
+            android:name="com.example.clubolympus.data.OlympusContentProvider"
+            android:exported="false"/>
     </application>
 
 </manifest>

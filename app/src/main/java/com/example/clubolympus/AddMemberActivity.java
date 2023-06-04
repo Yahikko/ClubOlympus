@@ -14,13 +14,13 @@ import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.Spinner;
 
-import java.util.ArrayList;
+import com.example.clubolympus.data.ClubOlympusContract.MemberEntry;
 
 public class AddMemberActivity extends AppCompatActivity {
 
     private EditText firstNameEditText;
     private EditText lastNameEditText;
-    private EditText groupEditText;
+    private EditText sportEditText;
     private Spinner genderSpinner;
     private int gender = 0;
     private ArrayAdapter<CharSequence> spinnerAdapter;
@@ -32,7 +32,7 @@ public class AddMemberActivity extends AppCompatActivity {
 
         firstNameEditText = findViewById(R.id.firstNameEditText);
         lastNameEditText = findViewById(R.id.lastNameEditText);
-        groupEditText = findViewById(R.id.groupEditText);
+        sportEditText = findViewById(R.id.sportEditText);
         genderSpinner = findViewById(R.id.genderSpinner);
 
         // Статический метод создания ArrayAdapter (лист создан в values/arrays.xml)
@@ -48,11 +48,11 @@ public class AddMemberActivity extends AppCompatActivity {
                 String selectedGender = (String) parent.getItemAtPosition(position);
                 if (!TextUtils.isEmpty(selectedGender)) {
                     if (selectedGender.equals("Male")) {
-                        gender = 1;
+                        gender = MemberEntry.GENDER_MALE;
                     } else if (selectedGender.equals("Female")) {
-                        gender = 2;
+                        gender = MemberEntry.GENDER_FEMALE;
                     } else {
-                        gender = 0;
+                        gender = MemberEntry.GENDER_UNKNOWN;
                     }
                 }
             }
