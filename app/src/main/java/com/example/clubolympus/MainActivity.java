@@ -7,9 +7,13 @@ import androidx.loader.app.LoaderManager;
 import androidx.loader.content.CursorLoader;
 import androidx.loader.content.Loader;
 
+import android.content.ContentUris;
 import android.content.Intent;
 import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ListView;
 
 import com.example.clubolympus.data.MemberCursorAdapter;
@@ -40,6 +44,13 @@ public class MainActivity extends AppCompatActivity
         memberCursorAdapter = new MemberCursorAdapter(this, null);
         lvMembers.setAdapter(memberCursorAdapter);
         LoaderManager.getInstance(this).initLoader(MEMBER_LOADER, null, this);
+
+        lvMembers.setOnItemClickListener((parent, view, position, id) -> {
+            Intent intent = new Intent(MainActivity.this, AddMemberActivity.class);
+            Uri currentMemberUri = ContentUris.withAppendedId(MemberEntry.CONTENT_URI, id);
+            intent.setData(currentMemberUri);
+            startActivity(intent);
+        });
     }
 
     @Override

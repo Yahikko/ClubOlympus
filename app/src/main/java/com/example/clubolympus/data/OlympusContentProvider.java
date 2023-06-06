@@ -53,6 +53,7 @@ public class OlympusContentProvider extends ContentProvider {
                 throw new RuntimeException("Insertion of data in the table failed for " + uri);
         }
         cursor.setNotificationUri(getContext().getContentResolver(), uri);
+
         return cursor;
     }
 
@@ -92,6 +93,7 @@ public class OlympusContentProvider extends ContentProvider {
                             "Insertion of data in the table failed for " + uri);
                     return null;
                 }
+                getContext().getContentResolver().notifyChange(uri, null);
                 return ContentUris.withAppendedId(uri, id);
             default:
                 throw new RuntimeException("Insertion of data in the table failed for " + uri);
@@ -107,14 +109,12 @@ public class OlympusContentProvider extends ContentProvider {
                 throw new RuntimeException("You have to input first name");
             }
         }
-
         if (values.containsKey(MemberEntry.COLUMN_LAST_NAME)) {
             String lastName = values.getAsString(MemberEntry.COLUMN_LAST_NAME);
             if (lastName == null) {
                 throw new RuntimeException("You have to input last name");
             }
         }
-
         if (values.containsKey(MemberEntry.COLUMN_GENDER)) {
             Integer gender = values.getAsInteger(MemberEntry.COLUMN_GENDER);
             if (gender == null || !(gender == MemberEntry.GENDER_UNKNOWN ||
@@ -122,7 +122,6 @@ public class OlympusContentProvider extends ContentProvider {
                 throw new RuntimeException("You have to input right gender");
             }
         }
-
         if (values.containsKey(MemberEntry.COLUMN_SPORT)) {
             String sport = values.getAsString(MemberEntry.COLUMN_SPORT);
             if (sport == null) {
@@ -132,36 +131,48 @@ public class OlympusContentProvider extends ContentProvider {
 
         SQLiteDatabase db = dbOpenHelper.getWritableDatabase();
         int match = uriMatcher.match(uri);
+        int rowsUpdated;
 
         switch (match) {
             case MEMBERS:
-                return db.update(MemberEntry.TABLE_NAME, values, selection, selectionArgs);
+                rowsUpdated = db.update(MemberEntry.TABLE_NAME, values, selection, selectionArgs);
+                break;
             case MEMBER_ID:
                 selection = MemberEntry._ID + "=?";
                 selectionArgs = new String[]{String.valueOf(ContentUris.parseId(uri))};
-
-                return db.update(MemberEntry.TABLE_NAME, values, selection, selectionArgs);
+                rowsUpdated = db.update(MemberEntry.TABLE_NAME, values, selection, selectionArgs);
+                break;
             default:
                 throw new RuntimeException("Updating of data in the table failed for " + uri);
         }
+        if (rowsUpdated != 0) {
+            getContext().getContentResolver().notifyChange(uri, null);
+        }
+        return rowsUpdated;
     }
 
     @Override
     public int delete(Uri uri, String selection, String[] selectionArgs) {
         SQLiteDatabase db = dbOpenHelper.getWritableDatabase();
         int match = uriMatcher.match(uri);
+        int rowsDeleted;
 
         switch (match) {
             case MEMBERS:
-                return db.delete(MemberEntry.TABLE_NAME, selection, selectionArgs);
+                rowsDeleted = db.delete(MemberEntry.TABLE_NAME, selection, selectionArgs);
+                break;
             case MEMBER_ID:
                 selection = MemberEntry._ID + "=?";
                 selectionArgs = new String[]{String.valueOf(ContentUris.parseId(uri))};
-
-                return db.delete(MemberEntry.TABLE_NAME, selection, selectionArgs);
+                rowsDeleted = db.delete(MemberEntry.TABLE_NAME, selection, selectionArgs);
+                break;
             default:
                 throw new RuntimeException("Deleting data in the table failed for " + uri);
         }
+        if (rowsDeleted != 0) {
+            getContext().getContentResolver().notifyChange(uri, null);
+        }
+        return rowsDeleted;
     }
 
     @Override
