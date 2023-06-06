@@ -9,9 +9,9 @@ import androidx.loader.app.LoaderManager;
 import androidx.loader.content.CursorLoader;
 import androidx.loader.content.Loader;
 
+import android.annotation.SuppressLint;
 import android.content.ContentResolver;
 import android.content.ContentValues;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
@@ -88,7 +88,6 @@ public class AddMemberActivity extends AppCompatActivity
                             }
                         }
                     }
-
                     @Override
                     public void onNothingSelected(AdapterView<?> parent) {
                         gender = 0;
@@ -112,6 +111,7 @@ public class AddMemberActivity extends AppCompatActivity
         return true;
     }
 
+    @SuppressLint("NonConstantResourceId")
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
@@ -190,21 +190,23 @@ public class AddMemberActivity extends AppCompatActivity
     }
 
     private void showDeleteMemberDialog() {
+
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setMessage("Do you want delete the Member?");
-        builder.setPositiveButton("Delete", (dialog, which) -> {
-            deleteMember();
-        });
+        builder.setPositiveButton("Delete", (dialog, which) -> deleteMember());
+
         builder.setNegativeButton("Cancel", (dialog, which) -> {
             if (dialog != null) {
                 dialog.dismiss();
             }
         });
+
         AlertDialog alertDialog = builder.create();
         alertDialog.show();
     }
 
     private void deleteMember() {
+
         if (currentMemberUri != null) {
             int rowsDeleted = getContentResolver().delete(currentMemberUri,
                     null, null);
@@ -222,6 +224,7 @@ public class AddMemberActivity extends AppCompatActivity
     @NonNull
     @Override
     public Loader<Cursor> onCreateLoader(int id, @Nullable Bundle args) {
+
         String[] projection = {
                 MemberEntry._ID,
                 MemberEntry.COLUMN_FIRST_NAME,
@@ -236,7 +239,9 @@ public class AddMemberActivity extends AppCompatActivity
 
     @Override
     public void onLoadFinished(@NonNull Loader<Cursor> loader, Cursor data) {
+
         if (data.moveToFirst()) {
+
             int firstNameColumnIndex = data.getColumnIndex(MemberEntry.COLUMN_FIRST_NAME);
             int lastNameColumnIndex = data.getColumnIndex(MemberEntry.COLUMN_LAST_NAME);
             int genderColumnIndex = data.getColumnIndex(MemberEntry.COLUMN_GENDER);
@@ -267,6 +272,5 @@ public class AddMemberActivity extends AppCompatActivity
 
     @Override
     public void onLoaderReset(@NonNull Loader<Cursor> loader) {
-
     }
 }

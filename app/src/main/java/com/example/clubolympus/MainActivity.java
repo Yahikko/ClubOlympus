@@ -12,8 +12,6 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
-import android.view.View;
-import android.widget.AdapterView;
 import android.widget.ListView;
 
 import com.example.clubolympus.data.MemberCursorAdapter;
@@ -68,21 +66,17 @@ public class MainActivity extends AppCompatActivity
                 MemberEntry.COLUMN_LAST_NAME,
                 MemberEntry.COLUMN_SPORT};
 
-        CursorLoader cursorLoader = new CursorLoader(this, MemberEntry.CONTENT_URI,
+        return new CursorLoader(this, MemberEntry.CONTENT_URI,
                 projection, null, null, null);
-
-        return cursorLoader;
     }
 
     @Override
     public void onLoadFinished(@NonNull Loader<Cursor> loader, Cursor data) {
-
         memberCursorAdapter.swapCursor(data);
     }
 
     @Override
     public void onLoaderReset(@NonNull Loader<Cursor> loader) {
-
         memberCursorAdapter.swapCursor(null);
     }
 }
