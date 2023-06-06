@@ -33,7 +33,7 @@
         <!--Параметр exported - виден ли провайдер для других приложений-->
         <provider
             android:authorities="com.example.clubolympus"
-            android:name="com.example.clubolympus.data.OlympusContentProvider"
+            android:name=".data.OlympusContentProvider"
             android:exported="false"/>
     </application>
 

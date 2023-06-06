@@ -4,6 +4,9 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.NavUtils;
 
+import android.content.ContentResolver;
+import android.content.ContentValues;
+import android.net.Uri;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.Menu;
@@ -13,6 +16,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.Spinner;
+import android.widget.Toast;
 
 import com.example.clubolympus.data.ClubOlympusContract.MemberEntry;
 
@@ -23,7 +27,7 @@ public class AddMemberActivity extends AppCompatActivity {
     private EditText sportEditText;
     private Spinner genderSpinner;
     private int gender = 0;
-    private ArrayAdapter<CharSequence> spinnerAdapter;
+    private ArrayAdapter spinnerAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,47 +39,48 @@ public class AddMemberActivity extends AppCompatActivity {
         sportEditText = findViewById(R.id.sportEditText);
         genderSpinner = findViewById(R.id.genderSpinner);
 
-        // Статический метод создания ArrayAdapter (лист создан в values/arrays.xml)
-        spinnerAdapter = ArrayAdapter.createFromResource(this, R.array.array_gender,
-                android.R.layout.simple_spinner_item);
-        spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinnerAdapter = ArrayAdapter.createFromResource(this,
+                R.array.array_gender, android.R.layout.simple_spinner_item);
+        spinnerAdapter.setDropDownViewResource(
+                android.R.layout.simple_spinner_dropdown_item);
         genderSpinner.setAdapter(spinnerAdapter);
 
-        //Присваиваем значение в gender по выбору в Spinner
-        genderSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                String selectedGender = (String) parent.getItemAtPosition(position);
-                if (!TextUtils.isEmpty(selectedGender)) {
-                    if (selectedGender.equals("Male")) {
-                        gender = MemberEntry.GENDER_MALE;
-                    } else if (selectedGender.equals("Female")) {
-                        gender = MemberEntry.GENDER_FEMALE;
-                    } else {
-                        gender = MemberEntry.GENDER_UNKNOWN;
+        genderSpinner.setOnItemSelectedListener
+                (new AdapterView.OnItemSelectedListener() {
+                    @Override
+                    public void onItemSelected(AdapterView<?> parent, View view,
+                                               int position, long id) {
+                        String selectedGender =
+                                (String) parent.getItemAtPosition(position);
+                        if (!TextUtils.isEmpty(selectedGender)) {
+                            if (selectedGender.equals("Male")) {
+                                gender = 1;
+                            } else if (selectedGender.equals("Female")) {
+                                gender = 2;
+                            } else {
+                                gender = 0;
+                            }
+                        }
                     }
-                }
-            }
 
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-                gender = 0;
-            }
-        });
+                    @Override
+                    public void onNothingSelected(AdapterView<?> parent) {
+                        gender = 0;
+                    }
+                });
     }
 
-    //Метод для отображения меню по созданной разметке из res/menu
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.edit_member_menu, menu);
         return true;
     }
 
-    //Метод для действия по нажатию кнопки в меню
     @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+    public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.save_member:
+                insertMember();
                 return true;
             case R.id.delete_member:
                 return true;
@@ -84,5 +89,31 @@ public class AddMemberActivity extends AppCompatActivity {
                 return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private void insertMember() {
+
+        String firstName = firstNameEditText.getText().toString().trim();
+        String lastName = lastNameEditText.getText().toString().trim();
+        String sport = sportEditText.getText().toString().trim();
+
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(MemberEntry.COLUMN_FIRST_NAME, firstName);
+        contentValues.put(MemberEntry.COLUMN_LAST_NAME, lastName);
+        contentValues.put(MemberEntry.COLUMN_SPORT, sport);
+        contentValues.put(MemberEntry.COLUMN_GENDER, gender);
+
+        ContentResolver contentResolver = getContentResolver();
+        Uri uri = contentResolver.insert(MemberEntry.CONTENT_URI,
+                contentValues);
+
+        if (uri == null) {
+            Toast.makeText(this,
+                    "Insertion of data in the table failed",
+                    Toast.LENGTH_LONG).show();
+        } else {
+            Toast.makeText(this,
+                    "Data saved", Toast.LENGTH_LONG).show();
+        }
     }
 }
